@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G. Shamshad Begum — Security & Automation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --bg2: #0d1117;
+    --bg3: #111820;
+    --surface: #141c24;
+    --border: rgba(0,255,180,0.12);
+    --border2: rgba(0,255,180,0.25);
+    --green: #00ffb4;
+    --green2: #00cc90;
+    --blue: #4db8ff;
+    --orange: #ff8c42;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --dim: #2a3a4a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 999; pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+    );
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(8,12,16,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    height: 58px;
+  }
+  .nav-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem; letter-spacing: 0.15em; color: var(--green);
+    text-decoration: none;
+  }
+  .nav-brand span { color: var(--text); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--green); }
+  .nav-status {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    color: var(--green);
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    padding-top: 58px;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,255,180,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,180,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+  }
+  .hero-glow {
+    position: absolute; width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,180,0.06), transparent 70%);
+    top: 10%; left: -10%; pointer-events: none;
+  }
+  .hero-left {
+    padding: clamp(3rem, 8vw, 7rem) clamp(2rem, 6vw, 5rem);
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; z-index: 1;
+  }
+  .terminal-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--green);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .terminal-line::before { content: '> '; opacity: 0.5; }
+  .cursor {
+    display: inline-block; width: 8px; height: 14px;
+    background: var(--green); margin-left: 2px;
+    animation: blink 1.1s step-end infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    letter-spacing: 0.04em; line-height: 0.9;
+    color: var(--text); margin-bottom: 0.5rem;
+  }
+  .hero-name .hl { color: var(--green); }
+  .hero-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+    color: var(--blue); letter-spacing: 0.08em;
+    margin-bottom: 2rem; line-height: 1.6;
+  }
+  .hero-summary {
+    font-size: 1rem; line-height: 1.8; color: rgba(226,232,240,0.7);
+    max-width: 540px; margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+  .hero-summary strong { color: var(--green); font-weight: 600; }
+  .hero-cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-glow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    background: transparent; color: var(--green);
+    border: 1px solid var(--green); padding: 0.85rem 2rem;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.25s; display: inline-block;
+    position: relative; overflow: hidden;
+  }
+  .btn-glow::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--green); transform: translateX(-100%);
+    transition: transform 0.25s; z-index: -1;
+  }
+  .btn-glow:hover { color: var(--bg); }
+  .btn-glow:hover::before { transform: translateX(0); }
+  .btn-ghost {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--dim); padding: 0.85rem 2rem;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.25s; display: inline-block;
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+
+  .hero-right {
+    border-left: 1px solid var(--border);
+    padding: clamp(3rem, 8vw, 7rem) 2rem;
+    display: flex; flex-direction: column; justify-content: center;
+    gap: 1rem; position: relative; z-index: 1;
+    background: linear-gradient(to bottom, transparent, rgba(0,255,180,0.02), transparent);
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.2rem 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    transition: border-color 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .metric-card::after {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--green);
+  }
+  .metric-card:hover { border-color: var(--border2); }
+  .metric-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; letter-spacing: 0.05em; color: var(--green);
+    line-height: 1; min-width: 70px;
+  }
+  .metric-info { flex: 1; }
+  .metric-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.2rem;
+  }
+  .metric-desc {
+    font-size: 0.8rem; color: rgba(226,232,240,0.6); line-height: 1.4;
+  }
+  .contact-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 1.2rem 1.5rem; margin-top: 0.5rem;
+  }
+  .contact-panel-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 0.8rem; opacity: 0.7;
+  }
+  .cp-item {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: var(--muted); padding: 0.3rem 0;
+    display: flex; align-items: center; gap: 0.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .cp-item:last-child { border-bottom: none; }
+  .cp-item a { color: var(--blue); text-decoration: none; }
+  .cp-item a:hover { color: var(--green); }
+  .cp-icon { color: var(--green); opacity: 0.7; font-size: 0.8rem; }
+
+  /* ─── SECTION COMMONS ─── */
+  section { border-top: 1px solid var(--border); }
+  .section-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.16em;
+    color: var(--green); text-transform: uppercase;
+    white-space: nowrap; opacity: 0.8;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: 0.06em; color: var(--text);
+  }
+  .section-rule { flex: 1; height: 1px; background: var(--border); }
+
+  /* ─── AUTOMATION HERO ─── */
+  #automation {
+    background: var(--bg2);
+  }
+  .auto-wrapper {
+    max-width: 1200px; margin: 0 auto;
+    padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 5vw, 4rem);
+  }
+  .auto-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .auto-tag::before {
+    content: '[ '; opacity: 0.4;
+  }
+  .auto-tag::after {
+    content: ' ]'; opacity: 0.4;
+  }
+  .auto-main-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    letter-spacing: 0.04em; line-height: 1;
+    margin-bottom: 0.5rem; color: var(--text);
+  }
+  .auto-main-title span { color: var(--green); }
+  .auto-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; color: var(--blue); letter-spacing: 0.06em;
+    margin-bottom: 2.5rem;
+  }
+  .auto-two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+    align-items: start;
+  }
+  .auto-desc {
+    font-size: 1rem; line-height: 1.8;
+    color: rgba(226,232,240,0.7); font-weight: 300;
+    margin-bottom: 2rem;
+  }
+  .auto-desc strong { color: var(--text); font-weight: 600; }
+  .impact-box {
+    background: linear-gradient(135deg, rgba(0,255,180,0.08), rgba(0,255,180,0.02));
+    border: 1px solid var(--border2);
+    padding: 1.5rem; margin-bottom: 2rem;
+    position: relative;
+  }
+  .impact-box::before {
+    content: '★ MANAGEMENT RECOGNIZED';
+    position: absolute; top: -0.6rem; left: 1rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.55rem;
+    letter-spacing: 0.15em; color: var(--green);
+    background: var(--bg2); padding: 0 0.5rem;
+  }
+  .impact-box-text {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+    color: var(--green); line-height: 1.7;
+  }
+  .perf-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .perf-cell {
+    background: var(--surface); padding: 1.5rem 1rem; text-align: center;
+  }
+  .perf-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem; letter-spacing: 0.05em; color: var(--green);
+    display: block; line-height: 1;
+  }
+  .perf-lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-top: 0.4rem; display: block;
+  }
+
+  /* Tech stack chips */
+  .stack-section { margin-top: 0; }
+  .stack-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1rem;
+  }
+  .stack-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    padding: 0.3rem 0.8rem; letter-spacing: 0.04em;
+    border: 1px solid var(--dim); color: rgba(226,232,240,0.6);
+    background: var(--surface); transition: all 0.2s;
+  }
+  .chip:hover { border-color: var(--green); color: var(--green); }
+  .chip.core { border-color: var(--green); color: var(--green); background: rgba(0,255,180,0.05); }
+  .chip.blue { border-color: var(--blue); color: var(--blue); background: rgba(77,184,255,0.05); }
+
+  /* ─── FLOW ─── */
+  .flow-container {
+    display: flex; gap: 0; overflow-x: auto;
+    border: 1px solid var(--border);
+  }
+  .flow-node {
+    flex: 1; min-width: 140px;
+    padding: 1.8rem 1.2rem;
+    border-right: 1px solid var(--border);
+    position: relative; background: var(--surface);
+    transition: background 0.25s;
+  }
+  .flow-node:last-child { border-right: none; }
+  .flow-node:hover { background: rgba(0,255,180,0.03); }
+  .flow-node::after {
+    content: '→';
+    position: absolute; right: -0.7rem; top: 50%; transform: translateY(-50%);
+    color: var(--green); opacity: 0.4; font-size: 1rem; z-index: 2;
+  }
+  .flow-node:last-child::after { display: none; }
+  .fn-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem; color: var(--green); letter-spacing: 0.12em;
+    margin-bottom: 0.6rem; opacity: 0.6;
+  }
+  .fn-icon { font-size: 1.4rem; margin-bottom: 0.6rem; display: block; }
+  .fn-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 0.8rem; color: var(--text); margin-bottom: 0.4rem;
+  }
+  .fn-desc {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    color: var(--muted); line-height: 1.6;
+  }
+
+  /* ─── UNZIP ─── */
+  #unzip { background: var(--bg); }
+  .unzip-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+    align-items: start;
+  }
+  .feature-row {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .feature-row:last-child { border-bottom: none; }
+  .fr-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem;
+    color: var(--green); opacity: 0.2; line-height: 1; min-width: 36px;
+  }
+  .fr-body { flex: 1; }
+  .fr-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 0.9rem; margin-bottom: 0.35rem; color: var(--text);
+  }
+  .fr-desc {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.66rem;
+    color: var(--muted); line-height: 1.65;
+  }
+
+  .terminal-window {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 0; overflow: hidden;
+  }
+  .tw-bar {
+    background: var(--surface); padding: 0.6rem 1rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .tw-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .tw-r { background: #ff5f56; }
+  .tw-y { background: #ffbd2e; }
+  .tw-g { background: #27c93f; }
+  .tw-title {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    color: var(--muted); letter-spacing: 0.08em; margin-left: 0.4rem;
+  }
+  .tw-body {
+    padding: 1.5rem; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; line-height: 1.8; overflow-x: auto;
+    white-space: pre; color: #7ec8a0;
+  }
+  .tw-body .kw { color: #c792ea; }
+  .tw-body .fn { color: #82aaff; }
+  .tw-body .cm { color: #546e7a; font-style: italic; }
+  .tw-body .st { color: #c3e88d; }
+  .tw-body .nm { color: var(--orange); }
+
+  .config-table {
+    border: 1px solid var(--border); overflow: hidden;
+    margin-top: 1.5rem;
+  }
+  .ct-head {
+    background: var(--surface);
+    display: grid; grid-template-columns: 1fr 1fr 2fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .ct-head span, .ct-row span {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    padding: 0.6rem 1rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ct-row {
+    display: grid; grid-template-columns: 1fr 1fr 2fr;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+  }
+  .ct-row:last-child { border-bottom: none; }
+  .ct-row:hover { background: rgba(0,255,180,0.03); }
+  .ct-row .key { color: var(--blue); }
+  .ct-row .val { color: var(--green); }
+  .ct-row .desc { color: var(--muted); font-size: 0.6rem; }
+
+  /* ─── EXPERIENCE ─── */
+  #experience { background: var(--bg2); }
+  .exp-card {
+    background: var(--surface); border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .exp-header {
+    display: flex; gap: 2rem; align-items: stretch;
+    border-bottom: 1px solid var(--border);
+  }
+  .exp-company-block {
+    background: rgba(0,255,180,0.05);
+    padding: 2rem; min-width: 220px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .exp-co-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; letter-spacing: 0.08em; color: var(--green);
+    margin-bottom: 0.3rem;
+  }
+  .exp-period {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase;
+    margin-bottom: 0.7rem;
+  }
+  .exp-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.58rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--green); border: 1px solid var(--green);
+    padding: 0.2rem 0.6rem; width: fit-content;
+  }
+  .exp-role-block { padding: 2rem; flex: 1; }
+  .exp-role-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 1.1rem; color: var(--blue); margin-bottom: 0.3rem;
+  }
+  .exp-role-org {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    color: var(--muted); letter-spacing: 0.06em;
+  }
+  .exp-body { padding: 2rem; }
+  .exp-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .exp-list li {
+    font-size: 0.92rem; line-height: 1.7; color: rgba(226,232,240,0.75);
+    padding-left: 1.5rem; position: relative; font-weight: 300;
+  }
+  .exp-list li::before {
+    content: '//'; position: absolute; left: 0;
+    color: var(--green); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; top: 0.25rem; opacity: 0.6;
+  }
+  .exp-list li strong { color: var(--text); font-weight: 600; }
+
+  /* ─── SKILLS ─── */
+  #skills { background: var(--bg); }
+  .skills-container { display: flex; flex-direction: column; gap: 2rem; }
+  .skill-row {
+    display: grid; grid-template-columns: 180px 1fr;
+    gap: 0; border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .skill-cat {
+    background: var(--surface); padding: 1.5rem;
+    display: flex; align-items: center;
+    border-right: 1px solid var(--border);
+  }
+  .skill-cat-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem; letter-spacing: 0.1em; color: var(--green);
+    writing-mode: vertical-lr; transform: rotate(180deg);
+    white-space: nowrap;
+  }
+  .skill-items {
+    padding: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.6rem;
+    align-content: flex-start;
+  }
+  .s-chip {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    padding: 0.35rem 0.9rem; letter-spacing: 0.04em;
+    border: 1px solid var(--dim); color: rgba(226,232,240,0.55);
+    background: transparent; transition: all 0.2s; cursor: default;
+  }
+  .s-chip:hover { border-color: var(--green); color: var(--green); background: rgba(0,255,180,0.04); }
+  .s-chip.hi { border-color: var(--green); color: var(--green); background: rgba(0,255,180,0.06); }
+  .s-chip.hi2 { border-color: var(--blue); color: var(--blue); background: rgba(77,184,255,0.06); }
+  .s-chip.hi3 { border-color: var(--orange); color: var(--orange); background: rgba(255,140,66,0.06); }
+
+  /* ─── CERTS ─── */
+  #certs { background: var(--bg2); }
+  .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .cert-card {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 2rem; position: relative; overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .cert-card:hover { border-color: var(--border2); }
+  .cert-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: linear-gradient(90deg, var(--green), transparent);
+  }
+  .cert-icon {
+    width: 52px; height: 52px;
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
+    color: var(--green); margin-bottom: 1.2rem;
+    background: rgba(0,255,180,0.05);
+  }
+  .cert-name {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--text);
+  }
+  .cert-body {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    color: var(--muted); line-height: 1.7;
+  }
+
+  /* ─── EDU ─── */
+  #education { background: var(--bg); }
+  .edu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .edu-card {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 2rem; position: relative; overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .edu-card:hover { border-color: var(--border2); }
+  .edu-level {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 0.6rem; opacity: 0.7;
+  }
+  .edu-degree {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem; letter-spacing: 0.04em; color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+  .edu-major { font-size: 0.85rem; color: var(--blue); margin-bottom: 0.8rem; font-weight: 600; }
+  .edu-uni {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    color: var(--muted); line-height: 1.6; margin-bottom: 1.2rem;
+  }
+  .edu-score-badge {
+    display: inline-flex; align-items: baseline; gap: 0.3rem;
+    background: rgba(0,255,180,0.08); border: 1px solid var(--border2);
+    padding: 0.4rem 1rem;
+  }
+  .edu-score-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem;
+    color: var(--green); letter-spacing: 0.04em; line-height: 1;
+  }
+  .edu-score-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.58rem;
+    color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 5vw, 4rem);
+  }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1.5rem;
+  }
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem; letter-spacing: 0.1em; color: var(--green);
+  }
+  .footer-brand span { color: var(--text); }
+  .footer-tagline {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+    color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--green); }
+  .footer-copy {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+    color: rgba(100,116,139,0.5); letter-spacing: 0.08em;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    #hero { grid-template-columns: 1fr; }
+    .hero-right { border-left: none; border-top: 1px solid var(--border); }
+    .auto-two-col { grid-template-columns: 1fr; }
+    .unzip-grid { grid-template-columns: 1fr; }
+    .edu-row, .cert-grid { grid-template-columns: 1fr; }
+    .nav-links, .nav-status { display: none; }
+    .skill-row { grid-template-columns: 1fr; }
+    .skill-cat { border-right: none; border-bottom: 1px solid var(--border); }
+    .skill-cat-label { writing-mode: horizontal-tb; transform: none; }
+    .exp-header { flex-direction: column; }
+    .exp-company-block { border-right: none; border-bottom: 1px solid var(--border); min-width: unset; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">GSB<span>.DEV</span></a>
+  <ul class="nav-links">
+    <li><a href="#automation">automation</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#education">education</a></li>
+    <li><a href="mailto:gshamshad855@gmail.com">contact</a></li>
+  </ul>
+  <div class="nav-status"><span class="status-dot"></span>Available for opportunities</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-left">
+    <p class="terminal-line">whoami — security analyst + automation engineer<span class="cursor"></span></p>
+    <h1 class="hero-name">G. Shamshad<br><span class="hl">Begum</span></h1>
+    <p class="hero-role">CYBER SECURITY COMPLIANCE · IDENTITY ACCESS MANAGEMENT · PROCESS AUTOMATION</p>
+    <p class="hero-summary">
+      4+ years delivering enterprise-grade security compliance and IAM solutions.
+      <strong>Independently designed and shipped production automations</strong> that replaced 
+      multi-day manual workflows — recognized by management and approved for 
+      organization-wide rollout.
+    </p>
+    <div class="hero-cta-row">
+      <a href="#automation" class="btn-glow">// View Automation Work</a>
+      <a href="mailto:gshamshad855@gmail.com" class="btn-ghost">Contact Me</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="metric-card reveal">
+      <div class="metric-num">4+</div>
+      <div class="metric-info">
+        <div class="metric-label">Experience</div>
+        <div class="metric-desc">Years in Cyber Security & Compliance at Kyndryl</div>
+      </div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-num">10d</div>
+      <div class="metric-info">
+        <div class="metric-label">Reduced to 25 Minutes</div>
+        <div class="metric-desc">Manual process time eliminated per 500 files</div>
+      </div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-num">5→1</div>
+      <div class="metric-info">
+        <div class="metric-label">Resources Required</div>
+        <div class="metric-desc">From 5 team members to fully automated solo run</div>
+      </div>
+    </div>
+    <div class="metric-card reveal">
+      <div class="metric-num">3800</div>
+      <div class="metric-info">
+        <div class="metric-label">Files Automated</div>
+        <div class="metric-desc">SAT result files processed without manual touch</div>
+      </div>
+    </div>
+    <div class="contact-panel reveal">
+      <div class="contact-panel-title">// contact_info.json</div>
+      <div class="cp-item"><span class="cp-icon">@</span><a href="mailto:gshamshad855@gmail.com">gshamshad855@gmail.com</a></div>
+      <div class="cp-item"><span class="cp-icon">#</span>+91 97011 42942</div>
+      <div class="cp-item"><span class="cp-icon">→</span><a href="https://www.linkedin.com/in/g-shamshad-begum" target="_blank">linkedin.com/in/g-shamshad-begum</a></div>
+      <div class="cp-item"><span class="cp-icon">◎</span>Hyderabad, Telangana, India</div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOMATION 1 -->
+<section id="automation">
+  <div class="auto-wrapper">
+    <div class="auto-tag">Automation Project 01 · Excel VBA + Power Query + ETL</div>
+    <h2 class="auto-main-title">SAT Results <span>Validation &</span><br>Consolidator</h2>
+    <p class="auto-sub">// Single-click automation · Solo initiative · Management approved · Org-wide rollout</p>
+
+    <div class="auto-two-col reveal">
+      <div>
+        <p class="auto-desc">
+          Identified a critical operational bottleneck where <strong>Multiple team members spent ~10 working days</strong> manually validating SAT result files one by one. Designed, architected, built, tested, and documented a single-click automation — entirely as a solo initiative — embedding years of operational knowledge into a reusable, audit-ready tool.
+        </p>
+        <div class="impact-box">
+          <p class="impact-box-text">
+            ✓ Approved by management and delivery leadership<br>
+            ✓ Recognized for solution quality, presentation &amp; impact<br>
+            ✓ Selected for account-level adoption with plans for broader rollout
+          </p>
+        </div>
+        <div class="perf-row">
+          <div class="perf-cell">
+            <span class="perf-num">10d</span>
+            <span class="perf-lbl">Before</span>
+          </div>
+          <div class="perf-cell">
+            <span class="perf-num">25m</span>
+            <span class="perf-lbl">After (500 files)</span>
+          </div>
+          <div class="perf-cell">
+            <span class="perf-num">0</span>
+            <span class="perf-lbl">Manual errors</span>
+          </div>
+        </div>
+      </div>
+      <div class="stack-section">
+        <div class="stack-title">// architecture</div>
+        <div class="stack-chips">
+          <span class="chip core">Excel VBA</span>
+          <span class="chip core">Power Query / M Language</span>
+          <span class="chip core">ETL Pipeline</span>
+          <span class="chip blue">Execution Log Framework</span>
+          <span class="chip blue">UI Folder Selection</span>
+          <span class="chip">Error Handling</span>
+          <span class="chip">Null Row Removal</span>
+          <span class="chip">Column Standardization</span>
+          <span class="chip">Load Timestamp Injection</span>
+          <span class="chip">UI Freeze / Lock Controls</span>
+          <span class="chip">Status Bar Updates</span>
+          <span class="chip">Audit-Ready Output</span>
+        </div>
+        <div class="stack-title">// delivery model</div>
+        <div class="stack-chips">
+          <span class="chip core">Solo Initiative</span>
+          <span class="chip">Requirement Analysis</span>
+          <span class="chip">Architecture Design</span>
+          <span class="chip">Build &amp; Testing</span>
+          <span class="chip">Documentation</span>
+          <span class="chip">Stakeholder Demo</span>
+        </div>
+        <div class="stack-title">// output capabilities</div>
+        <div class="stack-chips">
+          <span class="chip">3-tab extraction per file</span>
+          <span class="chip">File-level Status Logging</span>
+          <span class="chip">Success / Error / Skipped</span>
+          <span class="chip">Error Reason Codes</span>
+          <span class="chip">Corrupted File Handling</span>
+          <span class="chip">Consolidated Output Sheet</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section style="background: var(--bg2);">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-num">// process_flow</span>
+      <h2 class="section-title">How It Works</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="flow-container reveal">
+      <div class="flow-node">
+        <div class="fn-num">STEP_01</div>
+        <span class="fn-icon">📂</span>
+        <div class="fn-title">Open Workbook</div>
+        <div class="fn-desc">Instructions note displayed. UI initialized. Controls set to default state.</div>
+      </div>
+      <div class="flow-node">
+        <div class="fn-num">STEP_02</div>
+        <span class="fn-icon">🗂️</span>
+        <div class="fn-title">Folder Select</div>
+        <div class="fn-desc">UI dialog prompts user. Selected path written automatically to setup table.</div>
+      </div>
+      <div class="flow-node">
+        <div class="fn-num">STEP_03</div>
+        <span class="fn-icon">🔒</span>
+        <div class="fn-title">Lock Controls</div>
+        <div class="fn-desc">Refresh button disabled. Workbook frozen. Prevents accidental re-execution.</div>
+      </div>
+      <div class="flow-node">
+        <div class="fn-num">STEP_04</div>
+        <span class="fn-icon">⚙️</span>
+        <div class="fn-title">ETL Processing</div>
+        <div class="fn-desc">Extract 3 tabs. Remove nulls. Standardize columns. Inject timestamps. Append output.</div>
+      </div>
+      <div class="flow-node">
+        <div class="fn-num">STEP_05</div>
+        <span class="fn-icon">📋</span>
+        <div class="fn-title">Execution Log</div>
+        <div class="fn-desc">Per-file log: name, status, error reason, load time. Invalid files skipped safely.</div>
+      </div>
+      <div class="flow-node">
+        <div class="fn-num">STEP_06</div>
+        <span class="fn-icon">✅</span>
+        <div class="fn-title">Completion</div>
+        <div class="fn-desc">Workbook unlocked. Audit-ready output delivered. Full traceability maintained.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOMATION 2: Unzip -->
+<section id="unzip">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-num">// automation_project_02 · PowerShell</span>
+      <h2 class="section-title">Parallel Unzip Engine</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="unzip-grid reveal">
+      <div>
+        <p style="font-size:1rem; line-height:1.8; color:rgba(226,232,240,0.65); font-weight:300; margin-bottom:2rem;">
+          A production-grade PowerShell engine processing hundreds of ZIP files simultaneously via runspace pools. Deployable as a standalone EXE — zero PowerShell knowledge needed. Configurable, resumable, and fully logged.
+        </p>
+        <div class="feature-row">
+          <div class="fr-num">01</div>
+          <div class="fr-body">
+            <div class="fr-title">Parallel Runspace Pool</div>
+            <div class="fr-desc">Up to 4–6 simultaneous extractions. Configurable MaxParallelJobs for RAM safety. Throttle logic prevents memory overflow.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-num">02</div>
+          <div class="fr-body">
+            <div class="fr-title">GUI Progress Window</div>
+            <div class="fr-desc">Live Windows Forms progress bar with % counter. Cancel with confirmation. Auto-detects EXE vs PS1 runtime mode.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-num">03</div>
+          <div class="fr-body">
+            <div class="fr-title">Resume + Auto-Retry</div>
+            <div class="fr-desc">Skips already-archived ZIPs on restart. Retries each failed ZIP once before marking final failure status.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-num">04</div>
+          <div class="fr-body">
+            <div class="fr-title">Structured Output Architecture</div>
+            <div class="fr-desc">Auto-creates Excel/, CSV/, Archived/, Logs/, _TempUnzip/ folders. Handles filename collisions with auto-increment.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="fr-num">05</div>
+          <div class="fr-body">
+            <div class="fr-title">JSON Config File</div>
+            <div class="fr-desc">External Unzip.config.json for DryRun, BatchSize, MaxParallelJobs, SilentMode — no code edits for ops teams.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="terminal-window">
+          <div class="tw-bar">
+            <span class="tw-dot tw-r"></span>
+            <span class="tw-dot tw-y"></span>
+            <span class="tw-dot tw-g"></span>
+            <span class="tw-title">Unzip_Automation_Final.ps1</span>
+          </div>
+          <div class="tw-body"><span class="cm"># Parallel ZIP processing via Runspaces</span>
+<span class="kw">$RunspacePool</span> = [RunspaceFactory]::<span class="fn">CreateRunspacePool</span>(<span class="nm">1</span>, <span class="kw">$MaxParallelJobs</span>)
+<span class="kw">$RunspacePool</span>.Open()
+
+<span class="cm"># Per-ZIP structured result object</span>
+<span class="kw">$result</span> = [PSCustomObject]@{
+    ZipName = <span class="kw">$Zip</span>.Name
+    Status  = <span class="st">"SUCCESS"</span>
+    Error   = <span class="kw">$null</span>
+}
+
+<span class="cm"># Extract → Separate Excel/CSV → Archive</span>
+<span class="fn">Expand-Archive</span> -Path <span class="kw">$Zip</span>.FullName `
+    -DestinationPath <span class="kw">$ZipTemp</span> -Force
+
+<span class="cm"># Auto-increment on filename collision</span>
+<span class="kw">$i</span>=<span class="nm">1</span>
+<span class="kw">do</span> { <span class="kw">$dest</span> = <span class="st">"$base`_$i$ext"</span>; <span class="kw">$i</span>++ } `
+    <span class="kw">while</span> (<span class="fn">Test-Path</span> <span class="kw">$dest</span>)
+
+<span class="cm"># Timestamped structured log</span>
+<span class="fn">Write-Log</span> <span class="st">"SUCCESS - $($r.ZipName)"</span>
+<span class="fn">Write-Log</span> <span class="st">"TOTAL TIME: $($Duration.TotalMinutes) min"</span></div>
+        </div>
+        <div class="config-table">
+          <div class="ct-head">
+            <span>Parameter</span>
+            <span>Value</span>
+            <span>Description</span>
+          </div>
+          <div class="ct-row">
+            <span class="key">BatchSize</span>
+            <span class="val">800</span>
+            <span class="desc">ZIPs per batch (16GB RAM safe)</span>
+          </div>
+          <div class="ct-row">
+            <span class="key">MaxParallelJobs</span>
+            <span class="val">4</span>
+            <span class="desc">Concurrent runspace threads</span>
+          </div>
+          <div class="ct-row">
+            <span class="key">DryRun</span>
+            <span class="val">false</span>
+            <span class="desc">Validation mode for safe testing</span>
+          </div>
+          <div class="ct-row">
+            <span class="key">SilentMode</span>
+            <span class="val">false</span>
+            <span class="desc">Disables GUI for scheduled tasks</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-num">// work_experience</span>
+      <h2 class="section-title">Experience</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="exp-card reveal">
+      <div class="exp-header">
+        <div class="exp-company-block">
+          <div class="exp-co-name">Kyndryl</div>
+          <div class="exp-period">Sep 2021 — Present</div>
+          <div class="exp-badge"><span>●</span> Active · 4+ Years</div>
+        </div>
+        <div class="exp-role-block">
+          <div class="exp-role-title">Cyber Security Compliance Assurance</div>
+          <div class="exp-role-org">Kyndryl Solutions Pvt. Ltd · Hyderabad, India</div>
+        </div>
+      </div>
+      <div class="exp-body">
+        <ul class="exp-list">
+          <li>Led security compliance and risk management for enterprise clients including <strong>Dow Chemical, National Bank of Canada, Macy's,</strong> and <strong>McCain Foods</strong> — ensuring adherence to global security policies and audit standards.</li>
+          <li>Executed comprehensive control testing and evidence validation, reviewing operational procedures against global instructions and maintaining high audit readiness across multiple accounts.</li>
+          <li>Managed end-to-end <strong>IAM lifecycle</strong> including onboarding, role modification, offboarding, and privileged access governance using <strong>CyberArk</strong>.</li>
+          <li>Designed and delivered the <strong>SAT File Validation Automation</strong> as a solo initiative — replaced a 5-person, 10-day manual process with a 25-minute single-click solution. Approved by management for account-level adoption.</li>
+          <li>Implemented <strong>ETL-style automation architecture</strong> using Excel VBA for orchestration and Power Query (M language) for data ingestion, transformation, and consolidation.</li>
+          <li>Built a centralized <strong>Execution Log framework</strong> capturing file-level status, error reasons, and load timestamps to support audit traceability and operational transparency.</li>
+          <li>Supported internal and external audits by coordinating evidence submission, issue tracking, and closure — maintaining strong audit outcomes across all accounts.</li>
+          <li>Performed <strong>Quality Checks</strong> on new servers to validate patching, configuration, and hardening prior to production deployment.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-num">// skills_matrix</span>
+      <h2 class="section-title">Skills & Technologies</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="skills-container reveal">
+      <div class="skill-row">
+        <div class="skill-cat"><div class="skill-cat-label">Automation</div></div>
+        <div class="skill-items">
+          <span class="s-chip hi">Excel VBA</span>
+          <span class="s-chip hi">Power Query / M Language</span>
+          <span class="s-chip hi">PowerShell</span>
+          <span class="s-chip hi2">ETL Pipeline Design</span>
+          <span class="s-chip hi2">Runspace Parallel Processing</span>
+          <span class="s-chip">JSON Config Management</span>
+          <span class="s-chip">GUI (Windows Forms)</span>
+          <span class="s-chip">Execution Log Framework</span>
+          <span class="s-chip">Error Handling &amp; Recovery</span>
+          <span class="s-chip">DryRun / Validation Mode</span>
+          <span class="s-chip">Batch Processing</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-cat"><div class="skill-cat-label">Security</div></div>
+        <div class="skill-items">
+          <span class="s-chip hi">Security Program Delivery</span>
+          <span class="s-chip hi">Audit Readiness</span>
+          <span class="s-chip hi2">Control Testing &amp; Risk Management</span>
+          <span class="s-chip">Policy Implementation</span>
+          <span class="s-chip">Incident &amp; Issue Management</span>
+          <span class="s-chip">Evidence Coordination</span>
+          <span class="s-chip">Server Quality Checks</span>
+          <span class="s-chip">Patching &amp; Hardening Validation</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-cat"><div class="skill-cat-label">IAM</div></div>
+        <div class="skill-items">
+          <span class="s-chip hi">CyberArk (PAM)</span>
+          <span class="s-chip hi2">User Onboarding / Offboarding</span>
+          <span class="s-chip">Role &amp; Access Modification</span>
+          <span class="s-chip">Account Validation &amp; Decommissioning</span>
+          <span class="s-chip">Privileged Access Governance</span>
+          <span class="s-chip">IAM Lifecycle Management</span>
+        </div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-cat"><div class="skill-cat-label">Tools</div></div>
+        <div class="skill-items">
+          <span class="s-chip hi">Microsoft Excel (Advanced)</span>
+          <span class="s-chip hi2">ServiceNow</span>
+          <span class="s-chip hi2">Ansible</span>
+          <span class="s-chip hi3">Qualys Cloud Platform</span>
+          <span class="s-chip">Windows · Unix</span>
+          <span class="s-chip">BPS · SFS · ECM</span>
+          <span class="s-chip">Inventory Services</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTS -->
+<section id="certs">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-num">// certifications</span>
+      <h2 class="section-title">Certifications</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="cert-grid reveal">
+      <div class="cert-card">
+        <div class="cert-icon">K</div>
+        <div class="cert-name">Kyndryl Interskill — Cloud Fundamentals</div>
+        <div class="cert-body">Understanding of cloud service models (IaaS, PaaS, SaaS), deployment models, and cloud-native application concepts across major cloud platforms.</div>
+      </div>
+      <div class="cert-card">
+        <div class="cert-icon" style="border-color:rgba(77,184,255,0.4); color:var(--blue); background:rgba(77,184,255,0.05);">Q</div>
+        <div class="cert-name">Qualys — VM Detection &amp; Response</div>
+        <div class="cert-body">Hands-on experience deploying, monitoring, and managing the Qualys Cloud Platform for vulnerability management, detection, and risk mitigation in enterprise environments.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-num">// education</span>
+      <h2 class="section-title">Education</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="edu-row reveal">
+      <div class="edu-card">
+        <div class="edu-level">// master's degree · 2017–2019</div>
+        <div class="edu-degree">Master of Science</div>
+        <div class="edu-major">Computer Science</div>
+        <div class="edu-uni">Sri Krishnadevaraya University<br>Anantapur, Andhra Pradesh, India</div>
+        <div class="edu-score-badge">
+          <span class="edu-score-num">82.70</span>
+          <span class="edu-score-label">% aggregate</span>
+        </div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-level">// bachelor's degree · 2014–2017</div>
+        <div class="edu-degree">Bachelor of Science</div>
+        <div class="edu-major">Computer Science</div>
+        <div class="edu-uni">Sri Krishnadevaraya University<br>Anantapur, Andhra Pradesh, India</div>
+        <div class="edu-score-badge">
+          <span class="edu-score-num">65.00</span>
+          <span class="edu-score-label">% aggregate</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">GSB<span>.DEV</span></div>
+      <div class="footer-tagline">Cyber Security · Compliance · Process Automation</div>
+    </div>
+    <div class="footer-links">
+      <a href="mailto:gshamshad855@gmail.com">Email</a>
+      <a href="https://www.linkedin.com/in/g-shamshad-begum" target="_blank">LinkedIn</a>
+      <a href="#automation">Automation</a>
+      <a href="#experience">Experience</a>
+    </div>
+    <div class="footer-copy">© 2026 G. Shamshad Begum · Hyderabad, India</div>
+  </div>
+</footer>
+
+<script>
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        e.target.style.transitionDelay = `${i * 0.05}s`;
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Nav highlight
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) cur = s.id; });
+    links.forEach(a => {
+      a.style.color = a.getAttribute('href') === `#${cur}` ? 'var(--green)' : '';
+    });
+  });
+</script>
+</body>
+</html>
